@@ -61,11 +61,17 @@ async def handle_message(message: types.Message):
         await message.answer(answer)
 
     except Exception as e:
-        print("GEMINI ERROR:", repr(e))
 
-        await message.answer(
-            "Произошла ошибка при обращении к Gemini.\n"
-            "Посмотри логи Render."
+    error_text = repr(e)
+
+    print("=" * 60)
+    print("GEMINI ERROR:")
+    print(error_text)
+    print("=" * 60)
+
+    await message.answer(
+        f"❌ Gemini error:\n\n{error_text[:3000]}"
+    )
         )
 
 
