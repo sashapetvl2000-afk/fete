@@ -18,14 +18,11 @@ MODEL = "gemini-3.7-flash"
 
 
 # =========================================================
-# GEMINI CLIENT
+# GEMINI
 # =========================================================
 
 client = genai.Client(
-    api_key=GEMINI_API_KEY,
-    http_options={
-        "api_version": "v1"
-    }
+    api_key=GEMINI_API_KEY
 )
 
 
@@ -41,29 +38,27 @@ dp = Dispatcher()
 # ПАМЯТЬ ДИАЛОГОВ
 # =========================================================
 
-# user_id -> ID последнего взаимодействия Gemini
 user_interactions = {}
 
 
 # =========================================================
-# /start
+# START
 # =========================================================
 
 @dp.message(CommandStart())
 async def start_command(message: types.Message):
 
-    # Сбрасываем предыдущую память пользователя
     user_interactions.pop(message.from_user.id, None)
 
     await message.answer(
         "Привет! 🤖\n\n"
         "Я работаю на Gemini 3.7 Flash.\n"
-        "Можешь просто написать мне сообщение."
+        "Напиши мне любой вопрос."
     )
 
 
 # =========================================================
-# /reset
+# RESET
 # =========================================================
 
 @dp.message(lambda message: message.text == "/reset")
@@ -77,7 +72,7 @@ async def reset_command(message: types.Message):
 
 
 # =========================================================
-# СООБЩЕНИЯ
+# GEMINI
 # =========================================================
 
 @dp.message()
@@ -91,10 +86,6 @@ async def handle_message(message: types.Message):
 
     try:
 
-        # -------------------------------------------------
-        # Если у пользователя уже есть предыдущий диалог
-        # -------------------------------------------------
-
         previous_id = user_interactions.get(user_id)
 
         if previous_id:
@@ -105,10 +96,6 @@ async def handle_message(message: types.Message):
                 previous_interaction_id=previous_id
             )
 
-        # -------------------------------------------------
-        # Первое сообщение пользователя
-        # -------------------------------------------------
-
         else:
 
             interaction = client.interactions.create(
@@ -116,32 +103,21 @@ async def handle_message(message: types.Message):
                 input=user_text
             )
 
-        # -------------------------------------------------
-        # Сохраняем ID взаимодействия
-        # -------------------------------------------------
-
         user_interactions[user_id] = interaction.id
-
-        # -------------------------------------------------
-        # Получаем текст ответа
-        # -------------------------------------------------
 
         answer = interaction.output_text
 
         if not answer:
             answer = "Gemini не вернул текстовый ответ."
 
-        # -------------------------------------------------
-        # Telegram имеет ограничение на длину сообщения
-        # -------------------------------------------------
-
+        # Telegram ограничивает размер сообщения
         max_length = 4000
 
         for i in range(0, len(answer), max_length):
 
-            chunk = answer[i:i + max_length]
-
-            await message.answer(chunk)
+            await message.answer(
+                answer[i:i + max_length]
+            )
 
     except Exception as e:
 
@@ -159,7 +135,7 @@ async def handle_message(message: types.Message):
 
 
 # =========================================================
-# RENDER HEALTH CHECK
+# RENDER
 # =========================================================
 
 async def health_check(request):
@@ -208,7 +184,7 @@ async def start_web_server():
 
 
 # =========================================================
-# ЗАПУСК
+# MAIN
 # =========================================================
 
 async def main():
@@ -218,7 +194,6 @@ async def main():
     print("======================================")
     print("Telegram bot started")
     print("Model:", MODEL)
-    print("Gemini API: Interactions API")
     print("======================================")
 
     await dp.start_polling(bot)
