@@ -1,2 +1,0 @@
-# geminibot
-ef1
