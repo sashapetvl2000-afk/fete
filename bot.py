@@ -11,8 +11,8 @@ from google import genai
 # НАСТРОЙКИ
 # =========================
 
-TELEGRAM_TOKEN = os.environ[8819225995:AAGt-ITWWc2BNukP8OPg23HjvD5UFdDEj9I"]
-GEMINI_API_KEY = os.environ["AQ.Ab8RN6L66m-m-ro00XU8qVksXCbJPTE69IdhuJ-AidzEVqgRzA"]
+TELEGRAM_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
+GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 
 # Модель Gemini
 GEMINI_MODEL = "gemini-3.7-flash"
